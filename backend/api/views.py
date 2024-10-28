@@ -16,8 +16,8 @@ def get_contributors(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         contributor = Contributor.objects.create(
-            name=data['name'], email=data['email'])
-        return JsonResponse({'id': contributor.id, 'name': contributor.name, 'email': contributor.email})
+            name=data['name'], email=data['email'], member=data['member'])
+        return JsonResponse({'id': contributor.id, 'name': contributor.name, 'email': contributor.email, 'member': contributor.member})
 
 
 def get_charities(request):
@@ -36,9 +36,9 @@ def get_donations(request):
             donation_list.append({
                 'id': donation.id,
                 'contributor_id': donation.contributor.id,
-                'contributor_name': donation.contributor.name,  # Get contributor name
+                'contributor_name': donation.contributor.name,
                 'charity_id': donation.charity.id,
-                'charity_name': donation.charity.name,  # Get charity name
+                'charity_name': donation.charity.name,
                 'amount': str(donation.amount),
                 'date': donation.date.strftime("%Y-%m-%d"),
             })
@@ -56,7 +56,7 @@ def add_donation(request):
             contributor_id = data.get("contributor_id")
             charity_id = data.get("charity_id")
             amount = data.get("amount")
-            date_str = data.get("date")  # Get date as a string
+            date_str = data.get("date")
 
             if not all([contributor_id, charity_id, amount, date_str]):
                 return JsonResponse({"error": "All fields (contributor_id, charity_id, amount, date) are required."}, status=400)
@@ -89,14 +89,13 @@ def add_donation(request):
                 "contributor_id": donation.contributor.id,
                 "charity_id": donation.charity.id,
                 "amount": str(donation.amount),
-                # Format date as string for JSON response
                 "date": donation.date.strftime("%Y-%m-%d")
             }, status=201)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
         except Exception as e:
-            print(f"Error occurred: {e}")  # Log the error for debugging
+            print(f"Error occurred: {e}")
             return JsonResponse({"error": f"An unexpected error occurred: {str(e)}"}, status=500)
     else:
         return JsonResponse({"error": "Invalid HTTP method."}, status=405)
@@ -114,8 +113,9 @@ def contributor_detail(request, pk):
         data = json.loads(request.body)
         contributor.name = data['name']
         contributor.email = data['email']
+        contributor.member = data['member']
         contributor.save()
-        return JsonResponse({'id': contributor.id, 'name': contributor.name, 'email': contributor.email})
+        return JsonResponse({'id': contributor.id, 'name': contributor.name, 'email': contributor.email, 'member': contributor.member})
 
     elif request.method == 'DELETE':
         contributor.delete()

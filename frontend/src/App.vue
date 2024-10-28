@@ -34,6 +34,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Member</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -42,6 +43,7 @@
                             <td>{{ contributor.id }}</td>
                             <td>{{ contributor.name }}</td>
                             <td>{{ contributor.email }}</td>
+                            <td>{{ contributor.member }}</td>
                             <td>
                                 <button class="btn btn-sm btn-warning mx-1"
                                     @click="openContributorModal(contributor)">Edit</button>
@@ -72,6 +74,11 @@
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" v-model="newContributor.email" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="member" class="form-label">Member</label>
+                                    <input type="member" class="form-control" v-model="newContributor.member"
+                                        required />
                                 </div>
                                 <button type="submit" class="btn btn-success">{{ editingContributor ? "Save Changes" :
                                     "Add Contributor" }}</button>
@@ -121,8 +128,8 @@
                     <tbody>
                         <tr v-for="donation in donations" :key="donation.id">
                             <td>{{ donation.id }}</td>
-                            <td>{{ donation.contributor_name }}</td> <!-- Updated to show name -->
-                            <td>{{ donation.charity_name }}</td> <!-- Updated to show name -->
+                            <td>{{ donation.contributor_name }}</td>
+                            <td>{{ donation.charity_name }}</td>
                             <td>{{ donation.amount }}</td>
                             <td>{{ donation.date }}</td>
                         </tr>
@@ -175,7 +182,7 @@
             </div>
         </div>
         <div>
-            <DonationChart :charityData="charityDonationData" />
+            <DonationChart :charityData="charityDonationData" @chart-rendered="onChartRendered" />
 
         </div>
     </div>
@@ -255,7 +262,7 @@ export default {
             if (contributor) {
                 this.newContributor = { ...contributor };
             } else {
-                this.newContributor = { name: '', email: '' };
+                this.newContributor = { name: '', email: '', member: false };
             }
             const modal = new bootstrap.Modal(document.getElementById('contributorModal'));
             modal.show();
@@ -281,7 +288,7 @@ export default {
                         this.contributors.push(data);
                     }
                     this.editingContributor = null;
-                    this.newContributor = { name: '', email: '' };
+                    this.newContributor = { name: '', email: '', member: false };
                     const modal = bootstrap.Modal.getInstance(document.getElementById('contributorModal'));
                     if (modal) modal.hide();
                 })
@@ -316,7 +323,12 @@ export default {
             }, {});
 
             this.charityDonationData = Object.values(totals);
-        }
+        },
+
+        onChartRendered(chartInfo) {
+            console.log("Chart rendered with data:", chartInfo);
+        },
+
     },
     mounted() {
         this.fetchContributors();

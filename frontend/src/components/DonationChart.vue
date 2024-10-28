@@ -31,7 +31,7 @@ export default {
     },
     methods: {
         renderChart() {
-            if (this.chart) this.chart.destroy();  
+            if (this.chart) this.chart.destroy();
             const labels = this.charityData.map(item => item.charityName);
             const data = this.charityData.map(item => item.totalAmount);
 
@@ -54,6 +54,7 @@ export default {
                     },
                 },
             });
+            this.$emit('chart-rendered', { labels, data });
         },
     },
 };
